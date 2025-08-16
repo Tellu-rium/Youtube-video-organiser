@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Youtube.com clone</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <!-- Your original styles (unchanged) -->
+    <link rel="stylesheet" href="style/general.css">
+    <link rel="stylesheet" href="style/header.css">
+    <link rel="stylesheet" href="style/video.css">
+    <link rel="stylesheet" href="style/sidebar.css">
+</head>
+<body>
+    <!-- Header (unchanged) -->
+    <div class="header">
+        <div class="left-section">
+            <img class="hamburger" src="icon/hamburger-menu.svg" alt="Menu">
+            <img class="logo" src="icon/youtube-logo.svg" alt="YouTube">
+        </div>
+        <div class="middle-section">
+            <input class="search" type="text" placeholder="Search" aria-label="Search">
+            <button class="search-button" aria-label="Search">
+                <img class="search-icon" src="icon/search.svg" alt="">
+                <div class="tooltip">Search</div>
+            </button>
+            <button class="voice-search-button" aria-label="Voice Search">
+                <img class="voice-search-icon" src="icon/voice-search-icon.svg" alt="">
+                <div class="tooltip">Search with your voice</div>
+            </button>
+        </div>
+        <div class="right-section">
+            <div class="upload-icon-container">
+                <img class="upload-icon" src="icon/upload.svg" alt="Create">
+                <div class="tooltip">Create</div>
+            </div>
+            <div class="youtube-apps-icon-container">
+                <img class="youtube-apps-icon" src="icon/youtube-apps.svg" alt="Apps">
+                <div class="tooltip">YouTube Apps</div>
+            </div>
+            <div class="notifications-icon-container">
+                <img class="notifications-icon" src="icon/notifications.svg" alt="Notifications">
+                <div class="notifications-count">3</div>
+                <div class="tooltip">Notifications</div>
+            </div>
+            <img class="current-user-icon" src="channel-pictures/my-channel.jpeg" alt="You">
+        </div>
+    </div>
+
+    <!-- Sidebar (unchanged) -->
+    <div class="sidebar">
+        <div class="sidebar-link">
+            <img src="sidebar-icons/home.svg" alt="Home">
+            <div>Home</div>
+        </div>
+        <div class="sidebar-link">
+            <img src="sidebar-icons/explore.svg" alt="Explore">
+            <div>Explore</div>
+        </div>
+        <div class="sidebar-link">
+            <img src="sidebar-icons/subscriptions.svg" alt="Subscriptions">
+            <div>Subscriptions</div>
+        </div>
+        <div class="sidebar-link">
+            <img src="sidebar-icons/originals.svg" alt="Originals">
+            <div>Originals</div>
+        </div>
+        <div class="sidebar-link">
+            <img src="sidebar-icons/youtube-music.svg" alt="YouTube Music">
+            <div>YouTube Music</div>
+        </div>
+        <div class="sidebar-link">
+            <img src="sidebar-icons/library.svg" alt="Library">
+            <div>Library</div>
+        </div>
+    </div>
+
+    <!-- Your video grid container (we will populate this with JS to avoid downloading images) -->
+    <div class="video-grid" id="video-grid"></div>
+
+    <script>
+    // Your 27 links (from your previous message)
+    const urls = [
+      "https://youtu.be/5fyyQLF5os4",
+      "https://www.youtube.com/watch?v=QRbnws-zITg",
+      "https://www.youtube.com/watch?v=ODetOE6cbbc",
+      "https://youtu.be/0OViN3q7sHY",
+      "https://www.youtube.com/watch?v=Ru1hYrwCZJo",
+      "https://www.youtube.com/watch?v=eQHmKJh20_c",
+      "https://youtu.be/S5xKokqeOb4",
+      "https://youtu.be/928aRhhPP8I",
+      "https://youtu.be/my0tLDaWyDU",
+      "https://youtu.be/6oz-tOcwlVs",
+      "https://youtu.be/oSYI5SuQiYA",
+      "https://youtu.be/f9CMRMg0zjY",
+      "https://www.youtube.com/watch?v=7zNbcWuZRzg",
+      "https://youtu.be/Jv79l1b-eoI",
+      "https://youtu.be/vmIUvp0e1bw",
+      "https://youtu.be/tKHEEC-CBYY",
+      "https://youtu.be/ouInsh7-7UM",
+      "https://youtu.be/IYUN104W3Io",
+      "https://youtu.be/s_L-fp8gDzY",
+      "https://youtu.be/eDXGVplLvyg",
+      "https://youtu.be/ZWH-4GJaErM",
+      "https://youtu.be/OZDM1VA-rU0",
+      "https://youtu.be/mefGxK10bWQ",
+      "https://youtu.be/dtjb2OhEQcU",
+      "https://youtu.be/F4EvMVpx1Pw",
+      "https://youtu.be/YShVEXb7-ic",
+      "https://youtu.be/5KVDDfAkRgc"
+    ];
+
+    // Helper: extract YouTube ID
+    function getYouTubeID(url) {
+      try {
+        const u = new URL(url);
+        if (u.hostname === "youtu.be") return u.pathname.slice(1);
+        if (u.hostname.includes("youtube.com")) return u.searchParams.get("v");
+      } catch {
+        return null;
+      }
+      return null;
+    }
+
+    // Build one card using your exact structure/classes (no CSS changes)
+    function buildVideoCard({ title, authorName, authorUrl, videoId, pageUrl }) {
+      const preview = document.createElement("div");
+      preview.className = "preview";
+
+      const thumbnailRow = document.createElement("div");
+      thumbnailRow.className = "thumbnail-row";
+      const thumb = document.createElement("img");
+      thumb.className = "thumbnail";
+      thumb.loading = "lazy";
+      thumb.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      thumb.alt = title || "Video thumbnail";
+
+      // Click on thumbnail opens video
+      thumb.style.cursor = "pointer";
+      thumb.addEventListener("click", () => window.open(pageUrl, "_blank"));
+
+      const videoTime = document.createElement("div");
+      videoTime.className = "video-time";
+      // Duration isn't available without API; keep a placeholder to match layout
+      videoTime.textContent = ""; // leave empty to avoid fake info
+
+      thumbnailRow.appendChild(thumb);
+      thumbnailRow.appendChild(videoTime);
+
+      const grid = document.createElement("div");
+      grid.className = "grid";
+
+      const channelPicture = document.createElement("div");
+      channelPicture.className = "channel-picture";
+
+      const profile = document.createElement("img");
+      profile.className = "profile-pictures";
+      profile.loading = "lazy";
+      // Try to resolve real channel icon from channel URL via Unavatar (no downloads)
+      // Fallback to a simple initial-based avatar if it fails.
+      const encodedChannel = authorUrl ? encodeURIComponent(authorUrl) : "";
+      profile.src = authorUrl
+        ? `https://unavatar.io/youtube/${encodedChannel}`
+        : `https://unavatar.io/${encodeURIComponent(authorName || "YouTube")}`;
+      profile.alt = authorName ? `${authorName} avatar` : "Channel avatar";
+      profile.referrerPolicy = "no-referrer";
+      profile.onerror = () => {
+        profile.src = `https://unavatar.io/${encodeURIComponent(authorName || "YouTube")}`;
+      };
+
+      // Click on avatar opens channel (if available)
+      if (authorUrl) {
+        profile.style.cursor = "pointer";
+        profile.addEventListener("click", () => window.open(authorUrl, "_blank"));
+      }
+
+      channelPicture.appendChild(profile);
+
+      const videoInfo = document.createElement("div");
+      videoInfo.className = "video-info";
+
+      const titleEl = document.createElement("p");
+      titleEl.className = "title";
+      titleEl.textContent = title || videoId;
+      titleEl.style.cursor = "pointer";
+      titleEl.addEventListener("click", () => window.open(pageUrl, "_blank"));
+
+      const authorEl = document.createElement("p");
+      authorEl.className = "author";
+      authorEl.textContent = authorName || "Unknown Channel";
+
+      const viewsEl = document.createElement("p");
+      viewsEl.className = "views";
+      // We’re not using the Data API; views/time won’t be accurate without scraping.
+      // Keep the line to preserve your layout, but leave it minimal.
+      viewsEl.textContent = ""; // e.g., "·" or empty to avoid fake values
+
+      videoInfo.appendChild(titleEl);
+      videoInfo.appendChild(authorEl);
+      videoInfo.appendChild(viewsEl);
+
+      grid.appendChild(channelPicture);
+      grid.appendChild(videoInfo);
+
+      preview.appendChild(thumbnailRow);
+      preview.appendChild(grid);
+
+      return preview;
+    }
+
+    // Fetch lightweight metadata (title, channel) via YouTube oEmbed (no API key).
+    async function getMeta(url) {
+      try {
+        const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+        if (!res.ok) throw new Error("oEmbed failed");
+        const data = await res.json();
+        return {
+          title: data.title || "",
+          authorName: data.author_name || "",
+          authorUrl: data.author_url || "",
+        };
+      } catch {
+        return { title: "", authorName: "", authorUrl: "" };
+      }
+    }
+
+    async function renderAll() {
+      const grid = document.getElementById("video-grid");
+      grid.innerHTML = ""; // ensure we control the 27 entries
+
+      // Build all cards in parallel for speed, then append in order
+      const promises = urls.map(async (pageUrl) => {
+        const videoId = getYouTubeID(pageUrl);
+        if (!videoId) return null;
+        const meta = await getMeta(pageUrl);
+        return buildVideoCard({ ...meta, videoId, pageUrl });
+      });
+
+      const cards = await Promise.all(promises);
+      cards.filter(Boolean).forEach(card => grid.appendChild(card));
+    }
+
+    renderAll();
+    </script>
+</body>
+</html>
